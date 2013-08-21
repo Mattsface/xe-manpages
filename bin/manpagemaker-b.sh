@@ -308,7 +308,13 @@ createfooter()
 }
 
 XE_COMMAND="$1"
-HELPDISPLAY=$(xe help "$XE_COMMAND")
+
+
+if ! type xe >/dev/null 2>&1 ;then
+	ssh -t root@192.168.1.25 'xe help "$XE_COMMAND'
+else
+	HELPDISPLAY=$(xe help "$XE_COMMAND")
+fi
 
 OBJECT=${XE_COMMAND%%-*}
 OBJTYPE=${XE_COMMAND#*-}
@@ -324,22 +330,21 @@ if [[ -e "$HOME/.manpagemaker_creds.txt" ]] ;then
 fi
 
 createheader
-if [[ $OBJTYPE = "list" ]] ;then
-	createlistpage
-elif [[ $OBJTYPE = "param-set" ]] ;then
-	createparamsetpage
-elif [[ $OBJTYPE = "param-remove" ]] ;then
-	createparamremovepage
-elif [[ $OBJTYPE = "param-clear" ]] ;then
-	createparamclearpage
-elif [[ $OBJTYPE = "param-get" ]] ;then
-	createparamgetpage
-elif [[ $OBJTYPE = "param-add" ]] ;then
-	createparamaddpage
-else
-	createpage
-fi
+case $OBJECT in 
+	list) 
+		createlistpage;;
+	param-set) 
+		createparamsetpage;;
+	param-remove) 
+		createparamremovepage;;
+	param-clear) 
+		createparamclearpage;;
+	param-get) 
+		createparamgetpage;;
+	param-add) 
+		createparamaddpage;;
+	*) 
+		createpage;;
+esac
 createfooter
-
-
 
